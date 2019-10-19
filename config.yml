@@ -1,0 +1,29 @@
+seed: 1  # random seed (default: 1)
+
+paths:
+  root: /home/imamura/dataset/mvtec_anomaly_detection/carpet/  # root path of the dataset
+  train_good_dir: train/good  # name of directory containing good samples for training
+  test_good_dir: test/good  # name of directory containing good samples for testing
+  test_bad_dir: null  # name of directory containing bad samples for testing(when this argument is set to 'null', all directories other than \'good_dir\' are considered bad samples
+  ext: png  # extension of image files
+  dict_file: dict.npy  # save or load this file
+
+model_params:
+  batch_size: 1000  # input batch size for testing (default: 1000)
+  patch_size: 8  # split patch size (default: 16)
+  stride: 2  # split stride size (default: 8)
+  use_ssim: False  # use ssim index to compare
+  num_of_basis: 5  # number of basis (default: 300)
+  alpha: 1.0
+  transform_algorithm: omp #lasso_lars
+  transform_alpha: 1.0
+  fit_algorithm: lars
+  n_iter: 50
+  num_of_nonzero: 3  # number of nonzero (default: 5)
+  cutoff_edge_width: 2
+
+  # for visualize
+  visualized_ch: 343
+
+transform:
+  gray2rgb: False
