@@ -34,6 +34,7 @@ $ python3 main.py test config.yaml
 ## Contribution
 
 Table. AUROC of each method in anomaly detection experiment using 5 texture category of MVTec data set.
+
 | Category | AE(SSIM) | AE(L2) | AnoGAN | CNN <br>Feature Dictionary | Texture<br>Inspection | Sparse<br>Coding | MLF-SC<br>(Proposed) |
 |:--------:|:--------:|:------:|:------:|:--------------------------:|:---------------------:|:----------------:|:--------------------:|
 |  Carpet  |   0.87   |  0.59  |  0.54  |            0.72            |          0.88         |       0.58       |       **0.99**       |
