@@ -6,6 +6,8 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 import pickle
 import skimage
 import os
+import matplotlib.pyplot as plt
+import cv2
 
 
 class SparseCodingWithMultiDict(object):
@@ -113,8 +115,8 @@ class SparseCodingWithMultiDict(object):
         coder = SparseCoder(dictionary = self.dictionaries[ch], transform_algorithm=self.transform_algorithm, transform_n_nonzero_coefs=self.num_of_nonzero)
         
         self.visualize_features(coder=coder, mode='neg', ch=ch, org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, desc='visualizing for negative sample')
-        self.visualize_features(coder=coder, mode='pos', ch=ch, org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, desc='visualizing for positive sample')
-        
+        #self.visualize_features(coder=coder, mode='pos', ch=ch, org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, desc='visualizing for positive sample')
+
     def visualize_features(self, coder, mode, ch, org_H, org_W, patch_size, stride, desc=None):
         if mode == 'neg':
             loader = self.test_neg_loader
@@ -124,29 +126,40 @@ class SparseCodingWithMultiDict(object):
             raise ValueError("The argument 'mode' must be set to 'neg' or 'pos'.")
 
         for idx, batch_img in tqdm(enumerate(loader), desc=desc):
+            p_batch_img = batch_img
             for p in self.preprocesses:
-                batch_img = p(batch_img)
+                p_batch_img = p(p_batch_img)
 
-            for img in batch_img:
+            for img, img_org in zip(p_batch_img, batch_img):
                 P, C, H, W = img.shape
                 img_arr = img.reshape(P, C, H*W)
+                f_diff = numpy.zeros((1, org_H, org_W))
 
-                target_arr = img_arr[:,ch]
-                coefs = coder.transform(target_arr) 
-                rcn_arr = coefs.dot(self.dictionaries[ch])
+                for i in range(C):
+                    target_arr = img_arr[:,i]
+                    coefs = coder.transform(target_arr) 
+                    rcn_arr = coefs.dot(self.dictionaries[i])
+                    f_img_org = self.reconst_from_array(target_arr, org_H, org_W, patch_size, stride)
+                    f_img_rcn = self.reconst_from_array(rcn_arr, org_H, org_W, patch_size, stride)
+                    f_diff += numpy.square((f_img_org - f_img_rcn) / 2)
 
-                f_img_org = self.reconst_from_array(target_arr, org_H, org_W, patch_size, stride)
-                f_img_rcn = self.reconst_from_array(rcn_arr, org_H, org_W, patch_size, stride)
-
-                f_img = numpy.concatenate([f_img_org, f_img_rcn], axis=2).transpose(1,2,0)
-
+                f_diff /= C
+                color_map = plt.get_cmap('viridis')
+                heatmap = numpy.uint8(color_map(f_diff[0])[:, :, :3] * 255)
+                
+                transposed = img_org.transpose(1, 2, 0)
+                resized = cv2.resize(heatmap, (transposed.shape[0], transposed.shape[1]))
+                blended = cv2.addWeighted(transposed, 1.0, resized, 0.01, 2.2, dtype = cv2.CV_32F)
+                blended_normed = 255 * (blended - blended.min()) / (blended.max() - blended.min())
+                blended_out = numpy.array(blended_normed, numpy.int)
+                
                 output_path = os.path.join('visualized_results', mode)
                 os.makedirs(output_path, exist_ok=True)
 
                 err = numpy.sum((target_arr-rcn_arr)**2, axis=1)
                 sorted_err = numpy.sort(err)[::-1]
                 total_err = numpy.sum(sorted_err[:5])
-                skimage.io.imsave(os.path.join(output_path, str(idx)+'-'+str(total_err)+'.png'), f_img)
+                cv2.imwrite(os.path.join(output_path, str(idx)+'-'+str(total_err)+'.png'), blended_out)
 
     def reconst_from_array(self, arrs, org_H, org_W, patch_size, stride):
         rcn = numpy.zeros((1, org_H, org_W))
