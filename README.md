@@ -23,28 +23,27 @@ If you set `Grid` dataset , set `gray2rgb` in `config.yml` to `True`.
 
 ### Train
 ```
-$ python3 main.py tran config.yaml
+$ python3 main.py train config.yml
 ```
 
 ### Test
 ```
-$ python3 main.py test config.yaml
+$ python3 main.py test config.yml
 ```
 
 ## Contribution
 
-Table. AUROC of each method in anomaly detection experiment using 5 texture category of MVTec data set.
+Anomaly detection performance for the texture categories of the MVTec AD dataset. For each cell in the R1 / R2 columns, the ratio of correctly classified samples of normal R1 and that of anomalous images R2 are shown with R1 / R2 notation.  The maximum averages (R1 + R2) / 2 are marked with boldface. The performance for the non-sparse-coding-based methods are cited from Table 2 of (Bergmann et al., 2019). The AUROC columns show only sparse coding and MLF-SC.
 
-| Category | AE(SSIM) | AE(L2) | AnoGAN | CNN <br>Feature Dictionary | Texture<br>Inspection | Sparse<br>Coding | MLF-SC<br>(Proposed) |
-|:--------:|:--------:|:------:|:------:|:--------------------------:|:---------------------:|:----------------:|:--------------------:|
-|  Carpet  |   0.87   |  0.59  |  0.54  |            0.72            |          0.88         |       0.58       |       **0.99**       |
-|   Grid   |   0.94   |  0.90  |  0.58  |            0.59            |          0.72         |       0.89       |       **0.97**       |
-|  Leather |   0.78   |  0.75  |  0.64  |            0.87            |          0.97         |       0.95       |       **0.99**       |
-|   Tile   |   0.59   |  0.51  |  0.50  |          **0.93**          |          0.41         |       0.86       |         0.92         |
-|   Wood   |   0.73   |  0.73  |  0.62  |            0.91            |          0.78         |       0.97       |       **0.99**       |
-|    Avg.   |   0.78   |  0.70  |  0.58  |            0.80            |          0.75         |       0.85       |       **0.97**       |
-
-
+|   | R1 / R2 |  |  |  |  |  |  | AUROC |  |
+| :---: | :---: | --- | --- | --- | --- | --- | --- | :---: | --- |
+|  Category | AE (SSIM) | AE (L2) | AnoGAN | CNN<br/>Feature Dictionary | Texture<br/>Inspection | Sparse<br/>Coding | MLF-SC<br/>(Proposed) | Sparse<br/>Coding | MLF-SC<br/>(Proposed) |
+|  Carpet | 0.43 / 0.90 | 0.57 / 0.42 | 0.82 / 0.16 | 0.89 / 0.36 | 0.57 / 0.61 | 0.43 / 0.79 | **1.00 / 0.98** | 0.58 | **0.99** |
+|  Grid | 0.38 / 1.00 | 0.57 / 0.98 | 0.90 / 0.12 | 0.57 / 0.33 | 1.00 / 0.05 | 0.76 / 0.72 | **1.00 / 0.88** | 0.89 | **0.97** |
+|  Leather | 0.00 / 0.92 | 0.06 / 0.82 | 0.91 / 0.12 | 0.63 / 0.71 | 0.00 / 0.99 | 0.84 / 0.96 | **0.97 / 0.97** | 0.95 | **0.99** |
+|  Tile | 1.00 / 0.04 | 1.00 / 0.54 | 0.97 / 0.05 | 0.97 / 0.44 | 1.00 / 0.43 | 0.94 / 0.60 | **0.94 / 0.76** | 0.86 | **0.92** |
+|  Wood | 0.84 / 0.82 | 1.00 / 0.47 | 0.89 / 0.47 | 0.79 / 0.88 | 0.42 / 1.00 | 0.84 / 0.60 | **0.95 / 0.98** | 0.97 | **0.99** |
+|  Average | 0.53 / 0.74 | 0.64 / 0.65 | 0.90 / 0.18 | 0.77 / 0.54 | 0.60 / 0.62 | 0.７６ / 0.81 | **0.97 / 0.91** | 0.85 | **0.97** |
 
 ## License
 Non-commercial, research purposes only
