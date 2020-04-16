@@ -3,6 +3,12 @@
 MLF-SC (Multi-Layer Feature Sparse Coding) is an anomaly detection method that incorporates multipscale features to sparse coding.
 This is a PyTorch implementation for [MVTec](https://www.mvtec.com/company/research/datasets/mvtec-ad/) texture datasets (Carpet, Grid, Leather, Tile, Wood).
 
+## Output visualization of MVTec texture dataset (Carpet)
+
+![000-900](https://user-images.githubusercontent.com/46925310/79444545-4399a500-8016-11ea-9ef0-14f72f2c47ee.png)
+![000-774](https://user-images.githubusercontent.com/46925310/79444575-4bf1e000-8016-11ea-803a-410cc9623621.png)
+![001-768](https://user-images.githubusercontent.com/46925310/79444703-7cd21500-8016-11ea-9250-b51a7f6fae09.png)
+
 ## Install Python Requirements
 ```
 pip3 install -r requirements.txt
@@ -29,6 +35,11 @@ $ python3 main.py train config.yml
 ### Test
 ```
 $ python3 main.py test config.yml
+```
+
+### Visualize
+```
+$ python3 main.py visualize config.yml
 ```
 
 ## Contribution
