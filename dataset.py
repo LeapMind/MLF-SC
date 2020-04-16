@@ -36,33 +36,33 @@ class MVTecDataset(object):
 
         if train:
             dir_path = os.path.abspath(os.path.join(root, neg_dir))
-            self.dataset = [skimage.io.imread(os.path.join(dir_path, f)) for f in tqdm(os.listdir(dir_path), desc='loading dataset for training') if ext in f]
+            self.dataset = [(f, skimage.io.imread(os.path.join(dir_path, f))) for f in tqdm(os.listdir(dir_path), desc='loading dataset for training') if ext in f]
         else:
             if mode == 'neg':
                 dir_path = os.path.abspath(os.path.join(root, neg_dir))
-                self.dataset = [skimage.io.imread(os.path.join(dir_path, f)) for f in tqdm(os.listdir(dir_path), desc='loading negative dataset for testing') if ext in f]
+                self.dataset = [(f, skimage.io.imread(os.path.join(dir_path, f))) for f in tqdm(os.listdir(dir_path), desc='loading negative dataset for testing') if ext in f]
             else:
                 if pos_dir:
                     dir_path = os.path.abspath(os.path.join(root, pos_dir))
-                    self.dataset = [skimage.io.imread(os.path.join(dir_path, f)) for f in tqdm(os.listdir(dir_path), desc='loading positive dataset for testing') if ext in f]
+                    self.dataset = [(f, skimage.io.imread(os.path.join(dir_path, f))) for f in tqdm(os.listdir(dir_path), desc='loading positive dataset for testing') if ext in f]
                 else:
                     dir_path = os.path.abspath(os.path.join(root, neg_dir))
                     dir_parent_path = os.path.dirname(dir_path)
 
                     dir_paths = [os.path.join(dir_parent_path, d) for d in os.listdir(dir_parent_path) if d not in neg_dir]
-                    self.dataset = [skimage.io.imread(os.path.join(d, f)) for d in tqdm(dir_paths, desc='loading positive dataset for testing') for f in os.listdir(d) if ext in f]
+                    self.dataset = [(f, skimage.io.imread(os.path.join(d, f))) for d in tqdm(dir_paths, desc='loading positive dataset for testing') for f in os.listdir(d) if ext in f]
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        sample = self.dataset[idx]
+        sample = self.dataset[idx][1]
 
         if self.preprocessor:
             for p in self.preprocessor:
                 sample = p(sample)
 
-        return sample
+        return (self.dataset[idx][0], sample)
 
 
 class DataLoader(object):
@@ -94,8 +94,8 @@ class DataLoader(object):
 
         batch = []
         for idx in self.idxs[self.counter:self.counter+self.batch_size]:
-            batch.append(self.dataset[idx])
+            batch.append(self.dataset[idx][1])
 
         self.counter += self.batch_size
 
-        return numpy.stack(batch)
+        return self.dataset[idx][0], numpy.stack(batch)

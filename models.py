@@ -34,7 +34,8 @@ class SparseCodingWithMultiDict(object):
 
     def train(self):
         arrs = []
-        for batch_img in self.train_loader:
+        for batch_data in self.train_loader:
+            batch_img = batch_data[1]
             for p in self.preprocesses:
                 batch_img = p(batch_img)
             N, P, C, H, W = batch_img.shape
@@ -74,7 +75,8 @@ class SparseCodingWithMultiDict(object):
 
         errs = []
         top_5 = numpy.zeros(len(self.dictionaries))
-        for batch_img in tqdm(loader, desc=desc):
+        for batch_data in tqdm(loader, desc=desc):
+            batch_img = batch_data[1]
             for p in self.preprocesses:
                 batch_img = p(batch_img)
 
@@ -111,11 +113,10 @@ class SparseCodingWithMultiDict(object):
 
 
     def visualize(self, ch, org_H, org_W, patch_size, stride):
-        C = len(self.dictionaries)
         coder = SparseCoder(dictionary = self.dictionaries[ch], transform_algorithm=self.transform_algorithm, transform_n_nonzero_coefs=self.num_of_nonzero)
         
         self.visualize_features(coder=coder, mode='neg', ch=ch, org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, desc='visualizing for negative sample')
-        #self.visualize_features(coder=coder, mode='pos', ch=ch, org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, desc='visualizing for positive sample')
+        self.visualize_features(coder=coder, mode='pos', ch=ch, org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, desc='visualizing for positive sample')
 
     def visualize_features(self, coder, mode, ch, org_H, org_W, patch_size, stride, desc=None):
         if mode == 'neg':
@@ -125,7 +126,8 @@ class SparseCodingWithMultiDict(object):
         else:
             raise ValueError("The argument 'mode' must be set to 'neg' or 'pos'.")
 
-        for idx, batch_img in tqdm(enumerate(loader), desc=desc):
+        for idx, batch_data in tqdm(enumerate(loader), desc=desc):
+            batch_name, batch_img = batch_data[0], batch_data[1]
             p_batch_img = batch_img
             for p in self.preprocesses:
                 p_batch_img = p(p_batch_img)
@@ -159,7 +161,7 @@ class SparseCodingWithMultiDict(object):
                 err = numpy.sum((target_arr-rcn_arr)**2, axis=1)
                 sorted_err = numpy.sort(err)[::-1]
                 total_err = numpy.sum(sorted_err[:5])
-                cv2.imwrite(os.path.join(output_path, str(idx)+'-'+str(total_err)+'.png'), blended_out)
+                cv2.imwrite(os.path.join(output_path, batch_name.split('.')[0]+'-'+str(int(total_err))+'.png'), blended_out)
 
     def reconst_from_array(self, arrs, org_H, org_W, patch_size, stride):
         rcn = numpy.zeros((1, org_H, org_W))
