@@ -9,9 +9,13 @@ This is a PyTorch implementation for [MVTec](https://www.mvtec.com/company/resea
 ![000-774](https://user-images.githubusercontent.com/46925310/79444575-4bf1e000-8016-11ea-803a-410cc9623621.png)
 ![001-768](https://user-images.githubusercontent.com/46925310/79444703-7cd21500-8016-11ea-9250-b51a7f6fae09.png)
 
-## Install Python Requirements
+## Quick Start
 ```
+git clone git@github.com:LeapMind/MLF-SC.git
 pip3 install -r requirements.txt
+python3 main.py train sample_config.yml
+python3 main.py test sample_config.yml
+python3 main.py visualize sample_comfig.yml
 ```
 
 ## Download Dataset
