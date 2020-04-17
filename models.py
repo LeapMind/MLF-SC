@@ -255,7 +255,7 @@ class SparseCodingWithMultiDict(object):
         for ty in range(0, org_H - patch_size + 1, stride):
             for tx in range(0, org_W - patch_size + 1, stride):
                 arr = next(arr_iter)
-                rcn[:, ty : ty + patch_size, tx : tx + patch_size] = arr.reshape(
+                rcn[:, ty: ty + patch_size, tx: tx + patch_size] = arr.reshape(
                     1, patch_size, patch_size
                 )
         return rcn
