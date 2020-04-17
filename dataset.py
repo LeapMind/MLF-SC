@@ -21,7 +21,8 @@ class MVTecDataset(object):
 
             if mode == "pos" and (not pos_dir and not neg_dir):
                 raise ValueError(
-                    "The argument 'neg_dir' must be set in order to consider data contained in other directories as positive samples"
+                    "The argument 'neg_dir' must be set in order to consider data "
+                    "contained in other directories as positive samples"
                 )
 
         self.preprocessor = preprocessor
@@ -104,12 +105,12 @@ class DataLoader(object):
         return self
 
     def __next__(self):
-        if self.counter == 0 and self.shuffle == True:
+        if self.counter == 0 and self.shuffle:
             numpy.random.shuffle(self.idxs)
 
         if (
             self.counter + self.batch_size > len(self.dataset)
-            and self.drop_last == True
+            and self.drop_last
         ):
             self.counter = 0
             raise StopIteration()
@@ -119,7 +120,7 @@ class DataLoader(object):
             raise StopIteration()
 
         batch = []
-        for idx in self.idxs[self.counter : self.counter + self.batch_size]:
+        for idx in self.idxs[self.counter: self.counter + self.batch_size]:
             batch.append(self.dataset[idx][1])
 
         self.counter += self.batch_size

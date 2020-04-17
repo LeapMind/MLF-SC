@@ -27,11 +27,11 @@ class SplitImg(object):
             for tx in range(0, W - self.patch_size + 1, self.stride):
                 if self.data_format == "HWC":
                     split_images.append(
-                        img[ty : ty + self.patch_size, tx : tx + self.patch_size, :]
+                        img[ty: ty + self.patch_size, tx: tx + self.patch_size, :]
                     )
                 else:
                     split_images.append(
-                        img[:, ty : ty + self.patch_size, tx : tx + self.patch_size]
+                        img[:, ty: ty + self.patch_size, tx: tx + self.patch_size]
                     )
         return numpy.stack(split_images)
 
@@ -60,11 +60,11 @@ class BatchSplitImg(object):
                 for tx in range(0, W - self.patch_size + 1, self.stride):
                     if self.data_format == "HWC":
                         split_images.append(
-                            img[ty : ty + self.patch_size, tx : tx + self.patch_size, :]
+                            img[ty: ty + self.patch_size, tx: tx + self.patch_size, :]
                         )
                     else:
                         split_images.append(
-                            img[:, ty : ty + self.patch_size, tx : tx + self.patch_size]
+                            img[:, ty: ty + self.patch_size, tx: tx + self.patch_size]
                         )
             batch.append(numpy.stack(split_images))
         return numpy.stack(batch)
@@ -158,8 +158,8 @@ class VGG16Features(object):
             x = x[
                 :,
                 :,
-                self.cutoff_edge_width : -self.cutoff_edge_width,
-                self.cutoff_edge_width : -self.cutoff_edge_width,
+                self.cutoff_edge_width: -self.cutoff_edge_width,
+                self.cutoff_edge_width: -self.cutoff_edge_width,
             ]
 
         return x.detach().numpy()
@@ -191,8 +191,8 @@ class VGG16ScaledFeatures(object):
             x_ = x_[
                 :,
                 :,
-                self.cutoff_edge_width : -self.cutoff_edge_width,
-                self.cutoff_edge_width : -self.cutoff_edge_width,
+                self.cutoff_edge_width: -self.cutoff_edge_width,
+                self.cutoff_edge_width: -self.cutoff_edge_width,
             ]
         x_ = (x_ - x_.mean(dim=(2, 3), keepdim=True)) / x_.std(dim=(2, 3), keepdim=True)
 
