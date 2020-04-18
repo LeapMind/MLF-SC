@@ -50,7 +50,6 @@ def main():
         preprocessor.BatchSplitImg(
             patch_size=model_params["patch_size"],
             stride=model_params["stride"],
-            data_format="CHW",
         )
     )
 

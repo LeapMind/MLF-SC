@@ -6,35 +6,20 @@ from torchvision import models
 
 
 class BatchSplitImg(object):
-    def __init__(self, patch_size, stride, data_format="HWC"):
-        if not (data_format == "HWC" or data_format == "CHW"):
-            raise ValueError(
-                "The argument 'data_format' must be set to 'HWC' or 'CHW'."
-            )
-
+    def __init__(self, patch_size, stride):
         self.patch_size = patch_size
         self.stride = stride
-        self.data_format = data_format
 
     def __call__(self, batch_img):
-        if self.data_format == "HWC":
-            N, H, W, C = batch_img.shape
-        else:
-            N, C, H, W = batch_img.shape
-
+        N, C, H, W = batch_img.shape
         batch = []
         for img in batch_img:
             split_images = []
             for ty in range(0, H - self.patch_size + 1, self.stride):
                 for tx in range(0, W - self.patch_size + 1, self.stride):
-                    if self.data_format == "HWC":
-                        split_images.append(
-                            img[ty: ty + self.patch_size, tx: tx + self.patch_size, :]
-                        )
-                    else:
-                        split_images.append(
-                            img[:, ty: ty + self.patch_size, tx: tx + self.patch_size]
-                        )
+                    split_images.append(
+                        img[:, ty: ty + self.patch_size, tx: tx + self.patch_size]
+                    )
             batch.append(numpy.stack(split_images))
         return numpy.stack(batch)
 
