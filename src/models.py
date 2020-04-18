@@ -99,7 +99,7 @@ class SparseCodingWithMultiDict(object):
         for i in range(len(dict1)):
             ret += min(numpy.sum((dict1[i] - dict2[i]) ** 2), numpy.sum((dict1[i] + dict2[i]) ** 2))
         return ret
-        
+
     def save_dict(self, file_path):
         with open(file_path, "wb") as f:
             pickle.dump(self.dictionaries, f)
