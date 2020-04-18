@@ -1,5 +1,6 @@
 import os
-import skimage.io
+
+import cv2
 import numpy
 from tqdm import tqdm
 
@@ -32,7 +33,7 @@ class MVTecDataset(object):
         if train:
             dir_path = os.path.abspath(os.path.join(root, neg_dir))
             self.dataset = [
-                (f, skimage.io.imread(os.path.join(dir_path, f)))
+                (f, cv2.imread(os.path.join(dir_path, f))[:, :, [2, 1, 0]])
                 for f in tqdm(os.listdir(dir_path), desc="loading dataset for training")
                 if ext in f
             ]
@@ -40,7 +41,7 @@ class MVTecDataset(object):
             if mode == "neg":
                 dir_path = os.path.abspath(os.path.join(root, neg_dir))
                 self.dataset = [
-                    (f, skimage.io.imread(os.path.join(dir_path, f)))
+                    (f, cv2.imread(os.path.join(dir_path, f))[:, :, [2, 1, 0]])
                     for f in tqdm(
                         os.listdir(dir_path),
                         desc="loading negative dataset for testing",
@@ -51,7 +52,7 @@ class MVTecDataset(object):
                 if pos_dir:
                     dir_path = os.path.abspath(os.path.join(root, pos_dir))
                     self.dataset = [
-                        (f, skimage.io.imread(os.path.join(dir_path, f)))
+                        (f, cv2.imread(os.path.join(dir_path, f))[:, :, [2, 1, 0]])
                         for f in tqdm(
                             os.listdir(dir_path),
                             desc="loading positive dataset for testing",
@@ -68,7 +69,7 @@ class MVTecDataset(object):
                         if d not in neg_dir
                     ]
                     self.dataset = [
-                        (f, skimage.io.imread(os.path.join(d, f)))
+                        (f, cv2.imread(os.path.join(d, f))[:, :, [2, 1, 0]])
                         for d in tqdm(
                             dir_paths, desc="loading positive dataset for testing"
                         )

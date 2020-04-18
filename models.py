@@ -223,7 +223,7 @@ class SparseCodingWithMultiDict(object):
                 color_map = plt.get_cmap("viridis")
                 heatmap = numpy.uint8(color_map(f_diff[0])[:, :, :3] * 255)
 
-                transposed = img_org.transpose(1, 2, 0)
+                transposed = img_org.transpose(1, 2, 0)[:, :, [2, 1, 0]]
                 resized = cv2.resize(
                     heatmap, (transposed.shape[0], transposed.shape[1])
                 )
