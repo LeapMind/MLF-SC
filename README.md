@@ -17,7 +17,6 @@ git clone git@github.com:LeapMind/MLF-SC.git
 pip3 install -r requirements.txt
 python3 main.py train sample_config.yml
 python3 main.py test sample_config.yml
-python3 main.py visualize sample_comfig.yml
 ```
 
 ## Download Dataset
@@ -37,14 +36,9 @@ Set `root` in `config.yml` to texture dataset path (like `path/to/mvtec_anomaly_
 $ python3 main.py train config.yml
 ```
 
-### Test
+### Test and Visualize Output
 ```
 $ python3 main.py test config.yml
-```
-
-### Visualize
-```
-$ python3 main.py visualize config.yml
 ```
 
 ## Contribution

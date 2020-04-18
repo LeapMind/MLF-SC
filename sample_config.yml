@@ -21,6 +21,3 @@ model_params:
   n_iter: 50
   num_of_nonzero: 3  # number of nonzero (default: 5)
   cutoff_edge_width: 2
-
-  # for visualize
-  visualized_ch: 343
