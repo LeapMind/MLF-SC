@@ -44,6 +44,7 @@ class SparseCodingWithMultiDict(object):
         self.Mu = None
         self.Sigma = None
         self.dictionaries = None
+        self.dict_order = range(896)
 
     def train(self):
         arrs = []
@@ -70,7 +71,34 @@ class SparseCodingWithMultiDict(object):
             .components_
             for i in tqdm(range(C), desc="learning dictionary")
         ]
+        self.calc_dict_order()
         print("learned.")
+
+    def calc_dict_order(self):
+        self.dict_order = [0]
+        picked_set = set()
+        prev = self.dictionaries[0]
+        picked_set.add(0)
+        for i in range(len(self.dictionaries) - 1):
+            max_id = 0
+            max_val = -1
+            for j in range(len(self.dictionaries)):
+                if j in picked_set:
+                    continue
+                else:
+                    val = self.calc_diff(prev, self.dictionaries[j])
+                    if val > max_val:
+                        max_id = j
+                        max_val = val
+            self.dict_order.append(max_id)
+            prev = self.dictionaries[max_id]
+            picked_set.add(max_id)
+
+    def calc_diff(self, dict1, dict2):
+        ret = 0
+        for i in range(len(dict1)):
+            ret += min(numpy.sum((dict1[i] - dict2[i]) ** 2), numpy.sum((dict1[i] + dict2[i]) ** 2))
+        return ret
 
     def save_dict(self, file_path):
         with open(file_path, "wb") as f:
@@ -125,7 +153,8 @@ class SparseCodingWithMultiDict(object):
                 f_diff = numpy.zeros((1, org_H, org_W))
 
                 ch_err = []
-                for i in range(num_of_ch):
+                for num in range(num_of_ch):
+                    i = self.dict_order[num]
                     target_arr = img_arr[:, i]
                     coefs = coders[i].transform(target_arr)
                     rcn_arr = coefs.dot(self.dictionaries[i])
