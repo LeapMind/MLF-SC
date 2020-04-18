@@ -24,6 +24,3 @@ model_params:
 
   # for visualize
   visualized_ch: 343
-
-transform:
-  gray2rgb: False

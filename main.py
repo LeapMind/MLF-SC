@@ -29,12 +29,10 @@ def main():
     numpy.random.seed(config["seed"])
     paths = config["paths"]
     model_params = config["model_params"]
-    transform = config["transform"]
 
     preprocesses = []
     preprocesses.append(preprocessor.Resize((256, 256)))
-    if transform["gray2rgb"]:
-        preprocesses.append(preprocessor.Gray2RGB())
+    preprocesses.append(preprocessor.Gray2RGB())
     preprocesses.append(preprocessor.HWC2CHW())
     preprocesses.append(preprocessor.DivideBy255())
     preprocesses.append(preprocessor.TransformForTorchModel())

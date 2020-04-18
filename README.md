@@ -31,7 +31,6 @@ You can train and test for each texture dataset.
 
 ### Set dataset path to `config.yml`
 Set `root` in `config.yml` to texture dataset path (like `path/to/mvtec_anomaly_detection/carpet/`).  
-If you set `Grid` dataset , set `gray2rgb` in `config.yml` to `True`. 
 
 ### Train
 ```

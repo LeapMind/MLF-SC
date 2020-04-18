@@ -42,6 +42,11 @@ class Gray2RGB(object):
     def __call__(self, img):
         if len(img.shape) == 2:
             img = img[:, :, None]
+
+        # If input is RGB, do nothing
+        if img.shape[2] == 3:
+            return img
+
         return numpy.tile(img, (1, 1, 3))
 
 
