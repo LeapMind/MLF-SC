@@ -1,5 +1,7 @@
 # MLF-SC: Incorporating Multi-Layer Features to Sparse Coding for Unsupervised Anomaly Detection
 
+[![Actions Status](https://github.com/LeapMind/MLF-SC/workflows/MLF-SC/badge.svg)](https://github.com/LeapMind/MLF-SC/actions)
+
 MLF-SC (Multi-Layer Feature Sparse Coding) is an anomaly detection method that incorporates multipscale features to sparse coding.
 This is a PyTorch implementation for [MVTec](https://www.mvtec.com/company/research/datasets/mvtec-ad/) texture datasets (Carpet, Grid, Leather, Tile, Wood).
 
