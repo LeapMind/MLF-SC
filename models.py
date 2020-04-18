@@ -182,7 +182,7 @@ class SparseCodingWithMultiDict(object):
                 cv2.imwrite(
                     os.path.join(
                         output_path,
-                        batch_name.split(".")[0] + "-" + str(int(total_err)) + ".png",
+                        batch_name.split(".")[0] + "-" + str(int(numpy.sum(ch_err))) + ".png",
                     ),
                     blended_out,
                 )
