@@ -1,5 +1,5 @@
+import cv2
 import numpy
-from PIL import Image
 import torch
 import torch.nn.functional as F
 from torchvision import models
@@ -96,8 +96,7 @@ class RGB2Gray(object):
         self.num_output_channels = num_output_channels
 
     def __call__(self, img):
-        converted = numpy.asarray(Image.fromarray(img).convert("L"))[:, :, None]
-        return numpy.tile(converted, (1, 1, self.num_output_channels))
+        return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
 
 class Resize(object):
@@ -107,7 +106,7 @@ class Resize(object):
         self.size = size
 
     def __call__(self, img):
-        return numpy.array(Image.fromarray(img).resize(self.size, Image.BILINEAR))
+        return cv2.resize(img, dsize=self.size)
 
 
 class Normalize(object):
