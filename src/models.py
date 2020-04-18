@@ -80,7 +80,7 @@ class SparseCodingWithMultiDict(object):
         with open(file_path, "rb") as f:
             self.dictionaries = pickle.load(f)
 
-    def test(self, org_H, org_W, patch_size, stride):
+    def test(self, org_H, org_W, patch_size, stride, num_of_ch):
         C = len(self.dictionaries)
         coders = [
             SparseCoder(
@@ -93,17 +93,17 @@ class SparseCodingWithMultiDict(object):
 
         neg_err = self.calculate_error(
             coders=coders, mode="neg", desc="testing for negative sample",
-            org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride
+            org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, num_of_ch=num_of_ch
         )
         pos_err = self.calculate_error(
             coders=coders, mode="pos", desc="testing for positive sample",
-            org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride
+            org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, num_of_ch=num_of_ch
         )
 
         ap, auc = self.calculate_score(neg_err, pos_err)
         print("\nTest set: AP: {:.4f}, AUC: {:.4f}\n".format(ap, auc))
 
-    def calculate_error(self, coders, mode, desc, org_H, org_W, patch_size, stride):
+    def calculate_error(self, coders, mode, desc, org_H, org_W, patch_size, stride, num_of_ch):
         if mode == "neg":
             loader = self.test_neg_loader
         elif mode == "pos":
@@ -125,7 +125,7 @@ class SparseCodingWithMultiDict(object):
                 f_diff = numpy.zeros((1, org_H, org_W))
 
                 ch_err = []
-                for i in range(C):
+                for i in range(num_of_ch):
                     target_arr = img_arr[:, i]
                     coefs = coders[i].transform(target_arr)
                     rcn_arr = coefs.dot(self.dictionaries[i])
@@ -160,7 +160,7 @@ class SparseCodingWithMultiDict(object):
                 top_5[numpy.argsort(ch_err)[::-1][:5]] += 1
                 errs.append(numpy.sum(ch_err))
 
-                f_diff /= C
+                f_diff /= num_of_ch
                 color_map = plt.get_cmap("viridis")
                 heatmap = numpy.uint8(color_map(f_diff[0])[:, :, :3] * 255)
 

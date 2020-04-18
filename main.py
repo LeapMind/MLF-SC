@@ -134,6 +134,7 @@ def main():
             org_W=int(256 / 8.0) - model_params["cutoff_edge_width"] * 2,
             patch_size=model_params["patch_size"],
             stride=model_params["stride"],
+            num_of_ch=model_params["num_of_ch"],
         )
 
 
