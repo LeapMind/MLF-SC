@@ -10,14 +10,15 @@ paths:
 
 model_params:
   batch_size: 1000  # input batch size for testing (default: 1000)
-  patch_size: 8  # split patch size (default: 16)
-  stride: 2  # split stride size (default: 8)
+  patch_size: 8  # split patch size (default: 8)
+  stride: 2  # split stride size (default: 2)
   use_ssim: False  # use ssim index to compare
-  num_of_basis: 5  # number of basis (default: 300)
+  num_of_basis: 5  # number of basis (default: 5)
   alpha: 1.0
-  transform_algorithm: omp #lasso_lars
+  transform_algorithm: omp
   transform_alpha: 1.0
   fit_algorithm: lars
   n_iter: 50
-  num_of_nonzero: 3  # number of nonzero (default: 5)
+  num_of_nonzero: 3  # number of nonzero (default: 3)
   cutoff_edge_width: 2
+  num_of_ch: 10  # number of channels used for anomaly detection (1<=num_of_ch<=896)
