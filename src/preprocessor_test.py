@@ -24,7 +24,7 @@ class TestResize(unittest.TestCase):
 class TestHWC2CHW(unittest.TestCase):
 
     hwc2chw = preprocessor.HWC2CHW()
-    
+
     def test_call(self):
         image = np.zeros([1, 2, 3])
         ret_image = self.hwc2chw(image)
