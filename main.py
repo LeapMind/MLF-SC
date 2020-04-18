@@ -1,11 +1,12 @@
-import os
 import argparse
+import os
+
 import numpy
 import yaml
 
-import models
-import dataset
-import preprocessor
+import src.dataset as dataset
+import src.models as models
+import src.preprocessor as preprocessor
 
 
 def ini_file(d):

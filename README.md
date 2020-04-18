@@ -15,8 +15,8 @@ This is a PyTorch implementation for [MVTec](https://www.mvtec.com/company/resea
 ```
 git clone git@github.com:LeapMind/MLF-SC.git
 pip3 install -r requirements.txt
-python3 main.py train sample_config.yml
-python3 main.py test sample_config.yml
+python3 main.py train cfg/sample_config.yml
+python3 main.py test cfg/sample_config.yml
 ```
 
 ## Download Dataset
@@ -33,12 +33,12 @@ Set `root` in `config.yml` to texture dataset path (like `path/to/mvtec_anomaly_
 
 ### Train
 ```
-$ python3 main.py train config.yml
+$ python3 main.py train cfg/config.yml
 ```
 
 ### Test and Visualize Output
 ```
-$ python3 main.py test config.yml
+$ python3 main.py test cfg/config.yml
 ```
 
 ## Contribution

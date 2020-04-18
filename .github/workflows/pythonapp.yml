@@ -33,5 +33,5 @@ jobs:
         flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
     - name: Test
       run: |
-        python main.py train sample_config.yml
-        python main.py test sample_config.yml
+        python main.py train cfg/sample_config.yml
+        python main.py test cfg/sample_config.yml
