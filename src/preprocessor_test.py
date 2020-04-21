@@ -33,9 +33,9 @@ class TestToTensor(unittest.TestCase):
     totensor = preprocessor.ToTensor()
 
     def test_call(self):
-        image = np.zeros([3, 1, 2])
-        ret_tensor = self.totensor(image)
-        self.assertEqual(ret_tensor.shape, (3, 1, 2))
+        mtx = np.ones([30, 10, 20])
+        tensor = self.totensor(mtx)
+        self.assertEqual(tensor.shape, (30, 10, 20))
 
 
 class TestGray2RGB(unittest.TestCase):
