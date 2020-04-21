@@ -14,7 +14,8 @@ def ini_file(d):
         assert os.path.isfile(d)
         return d
     except Exception:
-        raise argparse.ArgumentTypeError("ini file {} cannot be located.".format(d))
+        raise argparse.ArgumentTypeError(
+            "ini file {} cannot be located.".format(d))
 
 
 def main():
@@ -54,10 +55,8 @@ def main():
 
     if args.split == "train":
         train_dataset = dataset.MVTecDataset(
-            root=paths["root"],
-            ext=paths["ext"],
-            train=True,
-            neg_dir=paths["train_good_dir"],
+            is_train=True,
+            dir_env=paths,
             preprocessor=preprocesses,
         )
         train_loader = dataset.DataLoader(
@@ -80,34 +79,21 @@ def main():
         )
         model.train()
         model.save_dict(paths["dict_file"])
+        model.save_ord(paths["ord_file"])
 
     elif args.split == "test":
         test_neg_dataset = dataset.MVTecDataset(
-            root=paths["root"],
-            ext=paths["ext"],
-            train=False,
-            mode="neg",
-            neg_dir=paths["test_good_dir"],
+            is_train=False,
+            dir_env=paths,
+            is_positive=False,
             preprocessor=preprocesses,
         )
-        if paths["test_bad_dir"] is None:
-            test_pos_dataset = dataset.MVTecDataset(
-                root=paths["root"],
-                ext=paths["ext"],
-                train=False,
-                mode="pos",
-                neg_dir=paths["test_good_dir"],
-                preprocessor=preprocesses,
-            )
-        else:
-            test_pos_dataset = dataset.MVTecDataset(
-                root=paths["root"],
-                ext=paths["ext"],
-                train=False,
-                mode="pos",
-                pos_dir=paths["test_bad_dir"],
-                preprocessor=preprocesses,
-            )
+        test_pos_dataset = dataset.MVTecDataset(
+            is_train=False,
+            dir_env=paths,
+            is_positive=True,
+            preprocessor=preprocesses,
+        )
 
         test_neg_loader = dataset.DataLoader(
             test_neg_dataset, batch_size=1, shuffle=False, drop_last=False
@@ -129,6 +115,7 @@ def main():
             test_pos_loader=test_pos_loader,
         )
         model.load_dict(paths["dict_file"])
+        model.load_ord(paths["ord_file"])
         model.test(
             org_H=int(256 / 8.0) - model_params["cutoff_edge_width"] * 2,
             org_W=int(256 / 8.0) - model_params["cutoff_edge_width"] * 2,

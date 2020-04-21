@@ -6,7 +6,8 @@ paths:
   test_good_dir: test/good  # name of directory containing good samples for testing
   test_bad_dir: null  # name of directory containing bad samples for testing(when this argument is set to 'null', all directories other than \'good_dir\' are considered bad samples
   ext: png  # extension of image files
-  dict_file: dict.npy  # save or load this file
+  dict_file: dict.pickle  # save or load this file
+  ord_file: ord.pickle
 
 model_params:
   batch_size: 1000  # input batch size for testing (default: 1000)
@@ -21,4 +22,4 @@ model_params:
   n_iter: 50
   num_of_nonzero: 3  # number of nonzero (default: 3)
   cutoff_edge_width: 2
-  num_of_ch: 10  # number of channels used for anomaly detection (1<=num_of_ch<=896)
+  num_of_ch: 100  # number of channels used for anomaly detection (1<=num_of_ch<=896)
