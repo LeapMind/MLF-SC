@@ -73,7 +73,6 @@ def main():
         )
         model.train()
         model.save_dict(paths["dict_file"])
-        model.save_ord(paths["ord_file"])
 
     elif args.split == "test":
         test_neg_dataset = dataset.MVTecDataset(
@@ -103,7 +102,6 @@ def main():
             test_pos_loader=test_pos_loader,
         )
         model.load_dict(paths["dict_file"])
-        model.load_ord(paths["ord_file"])
         model.test()
 
 

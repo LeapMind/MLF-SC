@@ -7,6 +7,7 @@ import pickle
 import os
 import matplotlib.pyplot as plt
 import cv2
+import random
 
 
 class SparseCodingWithMultiDict(object):
@@ -42,7 +43,6 @@ class SparseCodingWithMultiDict(object):
         self.test_pos_loader = test_pos_loader
 
         self.dictionaries = None
-        self.dict_order = range(896)
 
     def train(self):
         arrs = []
@@ -65,37 +65,11 @@ class SparseCodingWithMultiDict(object):
                 fit_algorithm=self.fit_algorithm,
                 n_iter=self.n_iter,
             )
-            .fit(train_arr[i])
+            .fit(train_arr[:, i, :])
             .components_
             for i in tqdm(range(C), desc="learning dictionary")
         ]
-        self.calc_dict_order()
         print("learned.")
-
-    def calc_dict_order(self):
-        self.dict_order = [0]
-        picked_set = {0}
-        prev = self.dictionaries[0]
-
-        for i in range(len(self.dictionaries) - 1):
-            max_id = 0
-            max_val = -1
-            for j in range(len(self.dictionaries)):
-                if j not in picked_set:
-                    val = self.calc_diff(prev, self.dictionaries[j])
-                    max_id = j if val > max_val else max_id
-                    max_val = max(max_val, val)
-
-            self.dict_order.append(max_id)
-            prev = self.dictionaries[max_id]
-            picked_set.add(max_id)
-
-    def calc_diff(self, dict1, dict2):
-        ret = 0
-        for i in range(len(dict1)):
-            ret += min(numpy.sum((dict1[i] - dict2[i]) ** 2),
-                       numpy.sum((dict1[i] + dict2[i]) ** 2))
-        return ret
 
     def save_dict(self, file_path):
         with open(file_path, "wb") as f:
@@ -139,6 +113,10 @@ class SparseCodingWithMultiDict(object):
         errs = []
         top_5 = numpy.zeros(len(self.dictionaries))
 
+        random.seed(0)
+        dict_order = list(range(896))
+        random.shuffle(dict_order)
+
         for batch_data in tqdm(loader, desc="testing"):
 
             batch_name, batch_img = batch_data[0], batch_data[1]
@@ -154,7 +132,7 @@ class SparseCodingWithMultiDict(object):
 
                 ch_err = []
                 for num in range(self.num_of_ch):
-                    i = self.dict_order[num]
+                    i = dict_order[num]
                     target_arr = img_arr[:, i]
                     coefs = coders[i].transform(target_arr)
                     rcn_arr = coefs.dot(self.dictionaries[i])
