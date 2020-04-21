@@ -1,11 +1,20 @@
 import unittest
 
+import numpy
+import yaml
+
 import models
 
 
 class TestCalculateScore(unittest.TestCase):
 
-    model = models.SparseCodingWithMultiDict([], 0, 0, None, 0, 0, 0, 0)
+    with open("./cfg/sample_config.yml") as f:
+        config = yaml.load(f, yaml.SafeLoader)
+
+    numpy.random.seed(config["seed"])
+    model_params = config["model_params"]
+
+    model = models.SparseCodingWithMultiDict([], model_params)
 
     def test_calculate_score(self):
         dn = [1, 4]

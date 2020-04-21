@@ -13,36 +13,34 @@ class SparseCodingWithMultiDict(object):
     def __init__(
         self,
         preprocesses,
-        num_of_basis,
-        alpha,
-        transform_algorithm,
-        transform_alpha,
-        fit_algorithm,
-        n_iter,
-        num_of_nonzero,
+        model_env,
         train_loader=None,
         test_neg_loader=None,
         test_pos_loader=None,
-        use_ssim=False,
     ):
+
         self.preprocesses = preprocesses
 
-        self.num_of_basis = num_of_basis
-        self.alpha = alpha
-        self.transform_algorithm = transform_algorithm
-        self.transform_alpha = transform_alpha
-        self.fit_algorithm = fit_algorithm
-        self.n_iter = n_iter
-        self.num_of_nonzero = num_of_nonzero
+        self.num_of_basis = model_env["num_of_basis"]
+        self.alpha = model_env["alpha"]
+        self.transform_algorithm = model_env["transform_algorithm"]
+        self.transform_alpha = model_env["transform_alpha"]
+        self.fit_algorithm = model_env["fit_algorithm"]
+        self.n_iter = model_env["n_iter"]
+        self.num_of_nonzero = model_env["num_of_nonzero"]
+        self.use_ssim = model_env["use_ssim"]
+
+        self.cutoff_edge_width = model_env["cutoff_edge_width"]
+        self.patch_size = model_env["patch_size"]
+        self.stride = model_env["stride"]
+        self.num_of_ch = model_env["num_of_ch"]
+
+        self.org_l = int(256 / 8.0) - self.cutoff_edge_width * 2
 
         self.train_loader = train_loader
         self.test_neg_loader = test_neg_loader
         self.test_pos_loader = test_pos_loader
 
-        self.use_ssim = use_ssim
-
-        self.Mu = None
-        self.Sigma = None
         self.dictionaries = None
         self.dict_order = range(896)
 
@@ -76,20 +74,18 @@ class SparseCodingWithMultiDict(object):
 
     def calc_dict_order(self):
         self.dict_order = [0]
-        picked_set = set()
+        picked_set = {0}
         prev = self.dictionaries[0]
-        picked_set.add(0)
+
         for i in range(len(self.dictionaries) - 1):
             max_id = 0
             max_val = -1
             for j in range(len(self.dictionaries)):
-                if j in picked_set:
-                    continue
-                else:
+                if j not in picked_set:
                     val = self.calc_diff(prev, self.dictionaries[j])
-                    if val > max_val:
-                        max_id = j
-                        max_val = val
+                    max_id = j if val > max_val else max_id
+                    max_val = max(max_val, val)
+
             self.dict_order.append(max_id)
             prev = self.dictionaries[max_id]
             picked_set.add(max_id)
@@ -117,7 +113,7 @@ class SparseCodingWithMultiDict(object):
         with open(file_path, "rb") as f:
             self.dict_order = pickle.load(f)
 
-    def test(self, org_H, org_W, patch_size, stride, num_of_ch):
+    def test(self):
         C = len(self.dictionaries)
         coders = [
             SparseCoder(
@@ -128,54 +124,44 @@ class SparseCodingWithMultiDict(object):
             for i in range(C)
         ]
 
-        neg_err = self.calculate_error(
-            coders=coders, mode="neg", desc="testing for negative sample",
-            org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, num_of_ch=num_of_ch
-        )
-        pos_err = self.calculate_error(
-            coders=coders, mode="pos", desc="testing for positive sample",
-            org_H=org_H, org_W=org_W, patch_size=patch_size, stride=stride, num_of_ch=num_of_ch
-        )
+        neg_err = self.calculate_error(coders=coders, is_positive=False)
+        pos_err = self.calculate_error(coders=coders, is_positive=True)
 
         ap, auc = self.calculate_score(neg_err, pos_err)
         print("\nTest set: AP: {:.4f}, AUC: {:.4f}\n".format(ap, auc))
 
-    def calculate_error(self, coders, mode, desc, org_H, org_W, patch_size, stride, num_of_ch):
-        if mode == "neg":
-            loader = self.test_neg_loader
-        elif mode == "pos":
+    def calculate_error(self, coders, is_positive):
+        if is_positive:
             loader = self.test_pos_loader
         else:
-            raise ValueError(
-                "The argument 'mode' must be set to 'neg' or 'pos'.")
+            loader = self.test_neg_loader
 
         errs = []
         top_5 = numpy.zeros(len(self.dictionaries))
-        for batch_data in tqdm(loader, desc=desc):
+
+        for batch_data in tqdm(loader, desc="testing"):
+
             batch_name, batch_img = batch_data[0], batch_data[1]
             p_batch_img = batch_img
             for p in self.preprocesses:
                 p_batch_img = p(p_batch_img)
 
-            for img, img_org in zip(p_batch_img, batch_img):
-                P, C, H, W = img.shape
-                img_arr = img.reshape(P, C, H * W)
-                f_diff = numpy.zeros((1, org_H, org_W))
+            for p_img, org_img in zip(p_batch_img, batch_img):
+
+                P, C, H, W = p_img.shape
+                img_arr = p_img.reshape(P, C, H * W)
+                f_diff = numpy.zeros((1, self.org_l, self.org_l))
 
                 ch_err = []
-                for num in range(num_of_ch):
+                for num in range(self.num_of_ch):
                     i = self.dict_order[num]
                     target_arr = img_arr[:, i]
                     coefs = coders[i].transform(target_arr)
                     rcn_arr = coefs.dot(self.dictionaries[i])
 
-                    f_img_org = self.reconst_from_array(
-                        target_arr, org_H, org_W, patch_size, stride
-                    )
-                    f_img_rcn = self.reconst_from_array(
-                        rcn_arr, org_H, org_W, patch_size, stride
-                    )
-                    f_diff += numpy.square((f_img_org - f_img_rcn) / 2)
+                    f_img_org = self.reconst_from_array(target_arr)
+                    f_img_rcn = self.reconst_from_array(rcn_arr)
+                    f_diff += numpy.square((f_img_org - f_img_rcn) / 1.5)
 
                     if not self.use_ssim:
                         err = numpy.sum((target_arr - rcn_arr) ** 2, axis=1)
@@ -198,23 +184,13 @@ class SparseCodingWithMultiDict(object):
 
                 top_5[numpy.argsort(ch_err)[::-1][:5]] += 1
                 errs.append(numpy.sum(ch_err))
+                f_diff /= self.num_of_ch
+                visualized_out = self.visualize(org_img, f_diff)
 
-                f_diff /= num_of_ch
-                color_map = plt.get_cmap("viridis")
-                heatmap = numpy.uint8(color_map(f_diff[0])[:, :, :3] * 255)
-
-                transposed = img_org.transpose(1, 2, 0)[:, :, [2, 1, 0]]
-                resized = cv2.resize(
-                    heatmap, (transposed.shape[0], transposed.shape[1])
-                )
-                blended = cv2.addWeighted(
-                    transposed, 1.0, resized, 0.01, 2.2, dtype=cv2.CV_32F
-                )
-                blended_normed = (
-                    255 * (blended - blended.min()) /
-                    (blended.max() - blended.min())
-                )
-                blended_out = numpy.array(blended_normed, numpy.int)
+                if is_positive:
+                    mode = "pos"
+                else:
+                    mode = "neg"
 
                 output_path = os.path.join("visualized_results", mode)
                 os.makedirs(output_path, exist_ok=True)
@@ -225,25 +201,44 @@ class SparseCodingWithMultiDict(object):
                         batch_name.split(".")[0] + "-" +
                         str(int(numpy.sum(ch_err))) + ".png",
                     ),
-                    blended_out,
+                    visualized_out,
                 )
 
         return errs
+
+    def visualize(self, org_img, f_diff):
+        color_map = plt.get_cmap("viridis")
+        heatmap = numpy.uint8(color_map(f_diff[0])[:, :, :3] * 255)
+        transposed = org_img.transpose(1, 2, 0)[:, :, [2, 1, 0]]
+        resized = cv2.resize(
+            heatmap, (transposed.shape[0], transposed.shape[1])
+        )
+        blended = cv2.addWeighted(
+            transposed, 1.0, resized, 0.01, 2.2, dtype=cv2.CV_32F
+        )
+        blended_normed = (
+            255 * (blended - blended.min()) /
+            (blended.max() - blended.min())
+        )
+        blended_out = numpy.array(blended_normed, numpy.int)
+        return blended_out
 
     def calculate_score(self, dn, dp):
         N = len(dn)
         y_score = numpy.concatenate([dn, dp])
         y_true = numpy.zeros(len(y_score), dtype=numpy.int32)
         y_true[N:] = 1
-        return average_precision_score(y_true, y_score), roc_auc_score(y_true, y_score)
+        return average_precision_score(y_true, y_score),\
+            roc_auc_score(y_true, y_score)
 
-    def reconst_from_array(self, arrs, org_H, org_W, patch_size, stride):
-        rcn = numpy.zeros((1, org_H, org_W))
+    def reconst_from_array(self, arrs):
+        rcn = numpy.zeros((1, self.org_l, self.org_l))
         arr_iter = iter(arrs)
-        for ty in range(0, org_H - patch_size + 1, stride):
-            for tx in range(0, org_W - patch_size + 1, stride):
+        for ty in range(0, self.org_l - self.patch_size + 1, self.stride):
+            for tx in range(0, self.org_l - self.patch_size + 1, self.stride):
                 arr = next(arr_iter)
-                rcn[:, ty: ty + patch_size, tx: tx + patch_size] = arr.reshape(
-                    1, patch_size, patch_size
+                rcn[:, ty: ty + self.patch_size, tx: tx + self.patch_size] =\
+                    arr.reshape(
+                    1, self.patch_size, self.patch_size
                 )
         return rcn
