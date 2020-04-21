@@ -37,8 +37,8 @@ jobs:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       with:
         coverageCommand: |
-	  pytest -v --doctest-modules --cov=scriic --cov-report=xml
-	coverageLocations: 'coverage.xml:coverage.py'
+          pytest -v --doctest-modules --cov=scriic --cov-report=xml
+        coverageLocations: 'coverage.xml:coverage.py'
     - name: Test
       run: |
         pip install pytest
