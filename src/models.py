@@ -75,17 +75,9 @@ class SparseCodingWithMultiDict(object):
         with open(file_path, "wb") as f:
             pickle.dump(self.dictionaries, f)
 
-    def save_ord(self, file_path):
-        with open(file_path, "wb") as f:
-            pickle.dump(self.dict_order, f)
-
     def load_dict(self, file_path):
         with open(file_path, "rb") as f:
             self.dictionaries = pickle.load(f)
-
-    def load_ord(self, file_path):
-        with open(file_path, "rb") as f:
-            self.dict_order = pickle.load(f)
 
     def test(self):
         C = len(self.dictionaries)
