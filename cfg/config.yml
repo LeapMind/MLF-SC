@@ -7,7 +7,6 @@ paths:
   test_bad_dir: null  # name of directory containing bad samples for testing(when this argument is set to 'null', all directories other than \'good_dir\' are considered bad samples
   ext: png  # extension of image files
   dict_file: dict.pickle  # save or load this file
-  ord_file: ord.pickle
 
 model_params:
   batch_size: 1000  # input batch size for testing (default: 1000)
