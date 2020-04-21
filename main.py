@@ -68,13 +68,7 @@ def main():
 
         model = models.SparseCodingWithMultiDict(
             preprocesses=model_preprocesses,
-            num_of_basis=model_params["num_of_basis"],
-            alpha=model_params["alpha"],
-            transform_algorithm=model_params["transform_algorithm"],
-            transform_alpha=model_params["transform_alpha"],
-            fit_algorithm=model_params["fit_algorithm"],
-            n_iter=model_params["n_iter"],
-            num_of_nonzero=model_params["num_of_nonzero"],
+            model_env=model_params,
             train_loader=train_loader,
         )
         model.train()
@@ -104,25 +98,13 @@ def main():
 
         model = models.SparseCodingWithMultiDict(
             preprocesses=model_preprocesses,
-            num_of_basis=model_params["num_of_basis"],
-            alpha=model_params["alpha"],
-            transform_algorithm=model_params["transform_algorithm"],
-            transform_alpha=model_params["transform_alpha"],
-            fit_algorithm=model_params["fit_algorithm"],
-            n_iter=model_params["n_iter"],
-            num_of_nonzero=model_params["num_of_nonzero"],
+            model_env=model_params,
             test_neg_loader=test_neg_loader,
             test_pos_loader=test_pos_loader,
         )
         model.load_dict(paths["dict_file"])
         model.load_ord(paths["ord_file"])
-        model.test(
-            org_H=int(256 / 8.0) - model_params["cutoff_edge_width"] * 2,
-            org_W=int(256 / 8.0) - model_params["cutoff_edge_width"] * 2,
-            patch_size=model_params["patch_size"],
-            stride=model_params["stride"],
-            num_of_ch=model_params["num_of_ch"],
-        )
+        model.test()
 
 
 if __name__ == "__main__":
