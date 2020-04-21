@@ -20,22 +20,17 @@ class TestBatchSplitImg(unittest.TestCase):
         self.assertEqual(ret.shape, (10, 6, 3, 4, 4))
 
 
-class TestHWC2CHW(unittest.TestCase):
+class TestHWC2CHWandToTensor(unittest.TestCase):
     hwc2chw = preprocessor.HWC2CHW()
+    totensor = preprocessor.ToTensor()
 
     def test_call(self):
         image = np.zeros([1, 2, 3])
         ret_image = self.hwc2chw(image)
         self.assertEqual(ret_image.shape, (3, 1, 2))
 
-
-class TestToTensor(unittest.TestCase):
-    totensor = preprocessor.ToTensor()
-
-    def test_call(self):
-        mtx = np.ones([30, 10, 20])
-        tensor = self.totensor(mtx)
-        self.assertEqual(tensor.shape, (30, 10, 20))
+        tensor = self.totensor(ret_image)
+        self.assertEqual(tensor.shape, (3, 1, 2))
 
 
 class TestGray2RGB(unittest.TestCase):
