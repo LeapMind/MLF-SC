@@ -67,7 +67,7 @@ class SparseCodingWithMultiDict(object):
                 fit_algorithm=self.fit_algorithm,
                 n_iter=self.n_iter,
             )
-            .fit(train_arr[:, i, :])
+            .fit(train_arr[i])
             .components_
             for i in tqdm(range(C), desc="learning dictionary")
         ]
@@ -105,9 +105,17 @@ class SparseCodingWithMultiDict(object):
         with open(file_path, "wb") as f:
             pickle.dump(self.dictionaries, f)
 
+    def save_ord(self, file_path):
+        with open(file_path, "wb") as f:
+            pickle.dump(self.dict_order, f)
+
     def load_dict(self, file_path):
         with open(file_path, "rb") as f:
             self.dictionaries = pickle.load(f)
+
+    def load_ord(self, file_path):
+        with open(file_path, "rb") as f:
+            self.dict_order = pickle.load(f)
 
     def test(self, org_H, org_W, patch_size, stride, num_of_ch):
         C = len(self.dictionaries)

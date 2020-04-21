@@ -14,7 +14,8 @@ def ini_file(d):
         assert os.path.isfile(d)
         return d
     except Exception:
-        raise argparse.ArgumentTypeError("ini file {} cannot be located.".format(d))
+        raise argparse.ArgumentTypeError(
+            "ini file {} cannot be located.".format(d))
 
 
 def main():
@@ -78,6 +79,7 @@ def main():
         )
         model.train()
         model.save_dict(paths["dict_file"])
+        model.save_ord(paths["ord_file"])
 
     elif args.split == "test":
         test_neg_dataset = dataset.MVTecDataset(
@@ -113,6 +115,7 @@ def main():
             test_pos_loader=test_pos_loader,
         )
         model.load_dict(paths["dict_file"])
+        model.load_ord(paths["ord_file"])
         model.test(
             org_H=int(256 / 8.0) - model_params["cutoff_edge_width"] * 2,
             org_W=int(256 / 8.0) - model_params["cutoff_edge_width"] * 2,
