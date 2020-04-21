@@ -28,4 +28,4 @@ class TestDatasetandDataLoader(unittest.TestCase):
         ret = 0
         for _ in self.dataloader:
             ret += 1
-        self.assertEqual(ret, 10)
+        self.assertEqual(ret, 10 // 2)
