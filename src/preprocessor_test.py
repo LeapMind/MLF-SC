@@ -33,9 +33,9 @@ class TestToTensor(unittest.TestCase):
     totensor = preprocessor.ToTensor()
 
     def test_call(self):
-        image = np.zeros([1, 2, 3])
+        image = np.zeros([3, 1, 2])
         ret_tensor = self.totensor(image)
-        self.assertEqual(ret_tensor.shape, (1, 2, 3))
+        self.assertEqual(ret_tensor.shape, (3, 1, 2))
 
 
 class TestGray2RGB(unittest.TestCase):
@@ -84,8 +84,6 @@ class DivideBy255(unittest.TestCase):
         image = np.ones([3, 1, 1])
         ret_image = self.divide(image)
         self.assertAlmostEqual(ret_image[0][0][0], 1 / 255)
-        self.assertAlmostEqual(ret_image[1][0][0], 1 / 255)
-        self.assertAlmostEqual(ret_image[2][0][0], 1 / 255)
 
 
 class VGG16ScaledFeatures(unittest.TestCase):
