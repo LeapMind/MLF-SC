@@ -67,7 +67,7 @@ class SparseCodingWithMultiDict(object):
                 fit_algorithm=self.fit_algorithm,
                 n_iter=self.n_iter,
             )
-            .fit(train_arr[i])
+            .fit(train_arr[:, i, :])
             .components_
             for i in tqdm(range(C), desc="learning dictionary")
         ]
@@ -97,7 +97,8 @@ class SparseCodingWithMultiDict(object):
     def calc_diff(self, dict1, dict2):
         ret = 0
         for i in range(len(dict1)):
-            ret += min(numpy.sum((dict1[i] - dict2[i]) ** 2), numpy.sum((dict1[i] + dict2[i]) ** 2))
+            ret += min(numpy.sum((dict1[i] - dict2[i]) ** 2),
+                       numpy.sum((dict1[i] + dict2[i]) ** 2))
         return ret
 
     def save_dict(self, file_path):
@@ -137,7 +138,8 @@ class SparseCodingWithMultiDict(object):
         elif mode == "pos":
             loader = self.test_pos_loader
         else:
-            raise ValueError("The argument 'mode' must be set to 'neg' or 'pos'.")
+            raise ValueError(
+                "The argument 'mode' must be set to 'neg' or 'pos'.")
 
         errs = []
         top_5 = numpy.zeros(len(self.dictionaries))
@@ -201,7 +203,8 @@ class SparseCodingWithMultiDict(object):
                     transposed, 1.0, resized, 0.01, 2.2, dtype=cv2.CV_32F
                 )
                 blended_normed = (
-                    255 * (blended - blended.min()) / (blended.max() - blended.min())
+                    255 * (blended - blended.min()) /
+                    (blended.max() - blended.min())
                 )
                 blended_out = numpy.array(blended_normed, numpy.int)
 
@@ -211,7 +214,8 @@ class SparseCodingWithMultiDict(object):
                 cv2.imwrite(
                     os.path.join(
                         output_path,
-                        batch_name.split(".")[0] + "-" + str(int(numpy.sum(ch_err))) + ".png",
+                        batch_name.split(".")[0] + "-" +
+                        str(int(numpy.sum(ch_err))) + ".png",
                     ),
                     blended_out,
                 )

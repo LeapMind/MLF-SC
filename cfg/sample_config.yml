@@ -21,4 +21,4 @@ model_params:
   n_iter: 50
   num_of_nonzero: 3  # number of nonzero (default: 3)
   cutoff_edge_width: 2
-  num_of_ch: 10  # number of channels used for anomaly detection (1<=num_of_ch<=896)
+  num_of_ch: 100  # number of channels used for anomaly detection (1<=num_of_ch<=896)
