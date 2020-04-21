@@ -32,11 +32,13 @@ jobs:
         # The GitHub editor is 127 chars wide
         flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
     - name: Code Climate Coverage Action
-      uses: paambaati/codeclimate-action@v2.3.0
+      uses: paambaati/codeclimate-action@v2.5.5
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       with:
-        coverageCommand: coverage xml
+        coverageCommand: |
+	  pytest -v --doctest-modules --cov=scriic --cov-report=xml
+	coverageLocations: 'coverage.xml:coverage.py'
     - name: Test
       run: |
         pip install pytest
