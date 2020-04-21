@@ -38,7 +38,7 @@ jobs:
       with:
         coverageCommand: |
           pip install pytest
-          pytest -v --doctest-modules --cov=scriic --cov-report=xml
+          pytest -v --cov=scriic --cov-report=xml
         coverageLocations: 'coverage.xml:coverage.py'
     - name: System Test
       run: |
