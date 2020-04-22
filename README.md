@@ -5,13 +5,12 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/88983fffd83c373f5808/test_coverage)](https://codeclimate.com/github/LeapMind/MLF-SC/test_coverage)
 
 MLF-SC (Multi-Layer Feature Sparse Coding) is an anomaly detection method that incorporates multi-scale features to sparse coding.
-This is a PyTorch implementation for [MVTec](https://www.mvtec.com/company/research/datasets/mvtec-ad/) texture datasets (Carpet, Grid, Leather, Tile, Wood).
+This is a PyTorch implementation for [MVTec](https://www.mvtec.com/company/research/datasets/mvtec-ad/) datasets (Carpet, Grid, Leather, Tile, Wood, ...).
 
-## Output visualization of MVTec texture dataset (Carpet)
-
-![000-900](https://user-images.githubusercontent.com/46925310/79444545-4399a500-8016-11ea-9ef0-14f72f2c47ee.png)
-![000-774](https://user-images.githubusercontent.com/46925310/79444575-4bf1e000-8016-11ea-803a-410cc9623621.png)
-![001-768](https://user-images.githubusercontent.com/46925310/79444703-7cd21500-8016-11ea-9250-b51a7f6fae09.png)
+## Output visualization of MVTec dataset (Grid, Hazelnut, and Bottle)
+![001-447078](https://user-images.githubusercontent.com/46925310/79984100-a641e380-84e3-11ea-8acb-c2822d879ab7.png)
+![010-390276](https://user-images.githubusercontent.com/46925310/79984083-a215c600-84e3-11ea-8788-aa59538e93c7.png)
+![018-341679](https://user-images.githubusercontent.com/46925310/79984095-a510b680-84e3-11ea-86d8-d603b00289aa.png)
 
 ## Quick Start
 ```
