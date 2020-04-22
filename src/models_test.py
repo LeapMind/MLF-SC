@@ -36,6 +36,11 @@ class TestCalculateScore(unittest.TestCase):
         self.assertAlmostEqual(
             self.model.calculate_ssim(arr1, arr1, dim)[0], -1.0)
 
+    def test_visualize(self):
+        img = np.zeros([3, 1, 1])
+        ret = self.model.visualize(img, img)
+        self.assertEqual(ret.shape, (1, 1, 3))
+
     def test_calculate_score(self):
         dn = [1, 4]
         dp1 = [5, 6]
