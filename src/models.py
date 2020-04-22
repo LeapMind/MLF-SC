@@ -1,7 +1,7 @@
 import numpy
 from tqdm import tqdm
 from sklearn.decomposition import MiniBatchDictionaryLearning, SparseCoder
-from skimage.measure import compare_ssim
+from skimage.metrics import structural_similarity
 from sklearn.metrics import average_precision_score, roc_auc_score
 import pickle
 import os
@@ -136,18 +136,7 @@ class SparseCodingWithMultiDict(object):
                     if not self.use_ssim:
                         err = numpy.sum((target_arr - rcn_arr) ** 2, axis=1)
                     else:
-                        err = [
-                            -1
-                            * compare_ssim(
-                                img_arr[p, c].reshape(H, W),
-                                rcn_arr[p, c].reshape(H, W),
-                                win_size=11,
-                                data_range=1.0,
-                                gaussian_weights=True,
-                            )
-                            for p in range(P)
-                            for c in range(C)
-                        ]
+                        err = self.calc_ssim(img_arr, rcn_arr, (P, C, H, W))
                     sorted_err = numpy.sort(err)[::-1]
                     total_err = numpy.sum(sorted_err[:5])
                     ch_err.append(total_err)
@@ -175,6 +164,21 @@ class SparseCodingWithMultiDict(object):
                 )
 
         return errs
+
+    def calculate_ssim(self, img_arr, rcn_arr, dim):
+        P, C, H, W = dim
+        return [
+            -1
+            * structural_similarity(
+                img_arr[p, c].reshape(H, W),
+                rcn_arr[p, c].reshape(H, W),
+                win_size=11,
+                data_range=1.0,
+                gaussian_weights=True,
+            )
+            for p in range(P)
+            for c in range(C)
+        ]
 
     def visualize(self, org_img, f_diff):
         color_map = plt.get_cmap("viridis")
