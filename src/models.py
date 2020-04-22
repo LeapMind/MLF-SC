@@ -145,25 +145,27 @@ class SparseCodingWithMultiDict(object):
                 errs.append(numpy.sum(ch_err))
                 f_diff /= self.num_of_ch
                 visualized_out = self.visualize(org_img, f_diff)
-
-                if is_positive:
-                    mode = "pos"
-                else:
-                    mode = "neg"
-
-                output_path = os.path.join("visualized_results", mode)
-                os.makedirs(output_path, exist_ok=True)
-
-                cv2.imwrite(
-                    os.path.join(
-                        output_path,
-                        batch_name.split(".")[0] + "-" +
-                        str(int(numpy.sum(ch_err))) + ".png",
-                    ),
-                    visualized_out,
-                )
-
+                self.output_image(is_positive, batch_name,
+                                  ch_err, visualized_out)
         return errs
+
+    def output_image(self, is_positive, batch_name, ch_err, visualized_out):
+        if is_positive:
+            mode = "pos"
+        else:
+            mode = "neg"
+
+        output_path = os.path.join("visualized_results", mode)
+        os.makedirs(output_path, exist_ok=True)
+
+        cv2.imwrite(
+            os.path.join(
+                output_path,
+                batch_name.split(".")[0] + "-" +
+                str(int(numpy.sum(ch_err))) + ".png",
+            ),
+            visualized_out,
+        )
 
     def calculate_ssim(self, img_arr, rcn_arr, dim):
         P, C, H, W = dim
