@@ -29,6 +29,6 @@ class TestDatasetandDataLoader(unittest.TestCase):
     def test_dataloader(self):
         self.assertEqual(len(self.dataloader_test), 2)
         ret = 0
-        for _ in self.dataloader:
+        for _ in self.dataloader_test:
             ret += 1
         self.assertEqual(ret, 2 // 2)
