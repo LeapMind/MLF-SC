@@ -22,7 +22,7 @@ class TestDatasetandDataLoader(unittest.TestCase):
 
     def test_dataset(self):
         self.assertEqual(len(self.mvtec_dataset), 2)
-        self.assertEqual(len(self.mvtec_dataset[0]), 2)
+        self.assertEqual(len(self.mvtec_dataset[0]), 3)
 
     def test_dataloader(self):
         self.assertEqual(len(self.dataloader), 2)
