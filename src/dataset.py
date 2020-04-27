@@ -32,24 +32,30 @@ class MVTecDataset(object):
 
         if dir_name:
             dir_path = os.path.abspath(os.path.join(root, dir_name))
-            self.dataset = self.load_dataset(dir_path, ext)
+            dir_parent_path = os.path.dirname(dir_path)
+            dir_name = os.path.basename(dir_path)
+            self.dataset = self.load_dataset(dir_parent_path, dir_name, ext)
         else:
             dir_path = os.path.abspath(os.path.join(root, excp_name))
             dir_parent_path = os.path.dirname(dir_path)
-            dir_paths = [
-                os.path.join(dir_parent_path, d)
+            dirs = [
+                d
                 for d in os.listdir(dir_parent_path)
                 if d not in excp_name
             ]
             self.dataset = []
-            for path in dir_paths:
-                self.dataset.extend(self.load_dataset(path, ext))
+            for dir_name in dirs:
+                self.dataset.extend(self.load_dataset(
+                    dir_parent_path, dir_name, ext))
 
-    def load_dataset(self, dir_path, ext):
+    def load_dataset(self, dir_parent_path, dir_name, ext):
+
         return [
-            (f, cv2.imread(os.path.join(dir_path, f))[:, :, [2, 1, 0]])
+            (dir_name, f, cv2.imread(os.path.join(
+                dir_parent_path, dir_name, f))
+             [:, :, [2, 1, 0]])
             for f in tqdm(
-                os.listdir(dir_path),
+                os.listdir(os.path.join(dir_parent_path, dir_name)),
                 desc="loading images"
             )
             if ext in f
@@ -59,13 +65,13 @@ class MVTecDataset(object):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        sample = self.dataset[idx][1]
+        sample = self.dataset[idx][2]
 
         if self.preprocessor:
             for p in self.preprocessor:
                 sample = p(sample)
 
-        return (self.dataset[idx][0], sample)
+        return (self.dataset[idx][0], self.dataset[idx][1], sample)
 
 
 class DataLoader(object):
@@ -100,8 +106,8 @@ class DataLoader(object):
 
         batch = []
         for idx in self.idxs[self.counter: self.counter + self.batch_size]:
-            batch.append(self.dataset[idx][1])
+            batch.append(self.dataset[idx][2])
 
         self.counter += self.batch_size
 
-        return self.dataset[idx][0], numpy.stack(batch)
+        return self.dataset[idx][0], self.dataset[idx][1], numpy.stack(batch)

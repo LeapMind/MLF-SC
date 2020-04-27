@@ -35,6 +35,7 @@ class SparseCodingWithMultiDict(object):
         self.patch_size = model_env["patch_size"]
         self.stride = model_env["stride"]
         self.num_of_ch = model_env["num_of_ch"]
+        self.output_npy = model_env["output_npy"]
 
         self.org_l = int(256 / 8.0) - self.cutoff_edge_width * 2
 
@@ -47,7 +48,7 @@ class SparseCodingWithMultiDict(object):
     def train(self):
         arrs = []
         for batch_data in self.train_loader:
-            batch_img = batch_data[1]
+            batch_img = batch_data[2]
             for p in self.preprocesses:
                 batch_img = p(batch_img)
             N, P, C, H, W = batch_img.shape
@@ -111,7 +112,7 @@ class SparseCodingWithMultiDict(object):
 
         for batch_data in tqdm(loader, desc="testing"):
 
-            batch_name, batch_img = batch_data[0], batch_data[1]
+            batch_path, batch_name, batch_img = batch_data
             p_batch_img = batch_img
             for p in self.preprocesses:
                 p_batch_img = p(p_batch_img)
@@ -144,18 +145,22 @@ class SparseCodingWithMultiDict(object):
                 top_5[numpy.argsort(ch_err)[::-1][:5]] += 1
                 errs.append(numpy.sum(ch_err))
                 f_diff /= self.num_of_ch
-                visualized_out = self.visualize(org_img, f_diff)
-                self.output_image(is_positive, batch_name,
-                                  ch_err, visualized_out)
+                if self.output_npy:
+                    self.output_np_array(batch_path, batch_name, f_diff)
+                else:
+                    visualized_out = self.visualize(org_img, f_diff)
+                    self.output_image(batch_path, batch_name,
+                                      ch_err, visualized_out)
         return errs
 
-    def output_image(self, is_positive, batch_name, ch_err, visualized_out):
-        if is_positive:
-            mode = "pos"
-        else:
-            mode = "neg"
+    def output_np_array(self, batch_path, batch_name, f_diff):
+        output_path = os.path.join("visualized_results", batch_path)
+        os.makedirs(output_path, exist_ok=True)
+        numpy.save(os.path.join(
+            output_path, batch_name.split(".")[0] + ".npy"), f_diff)
 
-        output_path = os.path.join("visualized_results", mode)
+    def output_image(self, batch_path, batch_name, ch_err, visualized_out):
+        output_path = os.path.join("visualized_results", batch_path)
         os.makedirs(output_path, exist_ok=True)
 
         cv2.imwrite(
