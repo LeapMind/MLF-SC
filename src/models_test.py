@@ -17,23 +17,22 @@ class TestCalculateScore(unittest.TestCase):
     model_params = config["model_params"]
 
     model = models.SparseCodingWithMultiDict([], model_params)
+    batch_path = "test"
+    batch_name = "image.png"
 
-    def output_np_array(self):
-        batch_path = "test"
-        batch_name = "sample.png"
+    def test_output_np_array(self):
         f_diff = np.ones([1, 10, 10])
-        self.model.output_np_array(batch_path, batch_name, f_diff)
-        self.assertTrue(os.path.exists("test/sample.npy"))
-        shutil.rmtree("test")
+        self.model.output_np_array(self.batch_path, self.batch_name, f_diff)
+        self.assertTrue(os.path.exists("visualized_results/test/image.npy"))
+        shutil.rmtree("visualized_results")
 
     def test_output_image(self):
-        batch_path = "good"
-        batch_name = "image.png"
         ch_err = np.ones([896])
         output_img = np.zeros([10, 10, 3])
-        self.model.output_image(batch_path, batch_name, ch_err, output_img)
+        self.model.output_image(
+            self.batch_path, self.batch_name, ch_err, output_img)
         self.assertTrue(os.path.exists(
-            "visualized_results/good/image-896.png"))
+            "visualized_results/test/image-896.png"))
         shutil.rmtree("visualized_results")
 
     def test_calclate_ssim(self):

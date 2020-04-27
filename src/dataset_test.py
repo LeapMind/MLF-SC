@@ -12,20 +12,22 @@ class TestDatasetandDataLoader(unittest.TestCase):
     dir_env["test_good_dir"] = "test/good"
     dir_env["test_bad_dir"] = None
 
-    mvtec_dataset = dataset.MVTecDataset(is_train=False, dir_env=dir_env)
-    dataloader = dataset.DataLoader(
-        mvtec_dataset,
+    mvtec_dataset_train = dataset.MVTecDataset(is_train=True, dir_env=dir_env)
+    mvtec_dataset_test = dataset.MVTecDataset(is_train=False, dir_env=dir_env)
+    dataloader_test = dataset.DataLoader(
+        mvtec_dataset_test,
         batch_size=2,
         shuffle=True,
         drop_last=False,
     )
 
     def test_dataset(self):
-        self.assertEqual(len(self.mvtec_dataset), 2)
-        self.assertEqual(len(self.mvtec_dataset[0]), 3)
+        self.assertEqual(len(self.mvtec_dataset_train), 10)
+        self.assertEqual(len(self.mvtec_dataset_test), 2)
+        self.assertEqual(len(self.mvtec_dataset_test[0]), 3)
 
     def test_dataloader(self):
-        self.assertEqual(len(self.dataloader), 2)
+        self.assertEqual(len(self.dataloader_test), 2)
         ret = 0
         for _ in self.dataloader:
             ret += 1
