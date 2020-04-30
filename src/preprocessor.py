@@ -18,7 +18,8 @@ class BatchSplitImg(object):
             for ty in range(0, H - self.patch_size + 1, self.stride):
                 for tx in range(0, W - self.patch_size + 1, self.stride):
                     split_images.append(
-                        img[:, ty: ty + self.patch_size, tx: tx + self.patch_size]
+                        img[:, ty: ty + self.patch_size,
+                            tx: tx + self.patch_size]
                     )
             batch.append(numpy.stack(split_images))
         return numpy.stack(batch)
@@ -98,6 +99,7 @@ class VGG16ScaledFeatures(object):
                         or (s == 1 and i == 14)
                         or (s == 2 and i == 7)
                     ):
+                        print(x.shape)
                         x_ = torch.cat([x_, x], dim=1)
                         break
 
@@ -108,6 +110,45 @@ class VGG16ScaledFeatures(object):
                 self.cutoff_edge_width: -self.cutoff_edge_width,
                 self.cutoff_edge_width: -self.cutoff_edge_width,
             ]
-        x_ = (x_ - x_.mean(dim=(2, 3), keepdim=True)) / x_.std(dim=(2, 3), keepdim=True)
+        x_ = (x_ - x_.mean(dim=(2, 3), keepdim=True)) / \
+            x_.std(dim=(2, 3), keepdim=True)
+
+        return x_
+
+
+class ResNet50ScaledFeatures(object):
+    def __init__(self, last_layer=50, cutoff_edge_width=0):
+        print(models.vgg16())
+        print(models.resnet50())
+        self.resnet50_features = torch.nn.ModuleList(
+            list(models.resnet50(pretrained=True))
+        ).eval()
+        self.cutoff_edge_width = cutoff_edge_width
+
+    def __call__(self, org):
+        x_ = torch.tensor([])
+        with torch.no_grad():
+            for s in range(3):
+                x = F.max_pool2d(org, (2 ** s, 2 ** s))
+                for i, f in enumerate(self.resnet50_features):
+                    x = f(x)
+                    if (
+                        (s == 0 and i == 21)
+                        or (s == 1 and i == 14)
+                        or (s == 2 and i == 7)
+                    ):
+                        print(x.shape)
+                        x_ = torch.cat([x_, x], dim=1)
+                        break
+
+        if self.cutoff_edge_width > 0:
+            x_ = x_[
+                :,
+                :,
+                self.cutoff_edge_width: -self.cutoff_edge_width,
+                self.cutoff_edge_width: -self.cutoff_edge_width,
+            ]
+        x_ = (x_ - x_.mean(dim=(2, 3), keepdim=True)) / \
+            x_.std(dim=(2, 3), keepdim=True)
 
         return x_

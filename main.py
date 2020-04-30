@@ -42,8 +42,8 @@ def main():
     model_preprocesses = []
     model_preprocesses.append(preprocessor.ToTensor())
     model_preprocesses.append(
-        preprocessor.VGG16ScaledFeatures(
-            last_layer=22, cutoff_edge_width=model_params["cutoff_edge_width"]
+        preprocessor.ResNet50ScaledFeatures(
+            last_layer=50, cutoff_edge_width=model_params["cutoff_edge_width"]
         )
     )
     model_preprocesses.append(
