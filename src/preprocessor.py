@@ -118,8 +118,21 @@ class VGG16ScaledFeatures(object):
 
 class ResNet50ScaledFeatures(object):
     def __init__(self, last_layer=50, cutoff_edge_width=0):
-        print(models.vgg16())
-        print(models.resnet50())
+        features = []
+        resnet50 = models.resnet50(pretrained=True)
+        features.append(resnet50.conv1)
+        features.append(resnet50.bn1)
+        features.append(resnet50.relu)
+        features.append(resnet50.maxpool)
+        features.append(resnet50.layer1)
+        self.features = torch.nn.ModuleList(features).eval()
+        print(self.features)
+
+        print(models.resnet50().conv1)
+        self.vgg16_features = torch.nn.ModuleList(
+            list(models.vgg16(pretrained=True).features)[:last_layer]
+        ).eval()
+        print(self.vgg16_features[0])
         self.resnet50_features = torch.nn.ModuleList(
             list(models.resnet50(pretrained=True))
         ).eval()
