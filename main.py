@@ -33,7 +33,7 @@ def main():
     model_params = config["model_params"]
 
     preprocesses = []
-    preprocesses.append(preprocessor.Resize((256, 256)))
+    preprocesses.append(preprocessor.Resize((1024, 1024)))
     preprocesses.append(preprocessor.Gray2RGB())
     preprocesses.append(preprocessor.HWC2CHW())
     preprocesses.append(preprocessor.DivideBy255())

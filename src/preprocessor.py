@@ -118,41 +118,79 @@ class VGG16ScaledFeatures(object):
 
 class ResNet50ScaledFeatures(object):
     def __init__(self, last_layer=50, cutoff_edge_width=0):
-        features = []
-        resnet50 = models.resnet50(pretrained=True)
-        features.append(resnet50.conv1)
-        features.append(resnet50.bn1)
-        features.append(resnet50.relu)
-        features.append(resnet50.maxpool)
-        features.append(resnet50.layer1)
-        self.features = torch.nn.ModuleList(features).eval()
-        print(self.features)
-
-        print(models.resnet50().conv1)
-        self.vgg16_features = torch.nn.ModuleList(
-            list(models.vgg16(pretrained=True).features)[:last_layer]
-        ).eval()
-        print(self.vgg16_features[0])
-        self.resnet50_features = torch.nn.ModuleList(
-            list(models.resnet50(pretrained=True))
-        ).eval()
+        self.resnet50 = models.resnet50(pretrained=True)
+        self.resnet50.eval()
         self.cutoff_edge_width = cutoff_edge_width
 
     def __call__(self, org):
         x_ = torch.tensor([])
         with torch.no_grad():
-            for s in range(3):
-                x = F.max_pool2d(org, (2 ** s, 2 ** s))
-                for i, f in enumerate(self.resnet50_features):
-                    x = f(x)
-                    if (
-                        (s == 0 and i == 21)
-                        or (s == 1 and i == 14)
-                        or (s == 2 and i == 7)
-                    ):
-                        print(x.shape)
-                        x_ = torch.cat([x_, x], dim=1)
-                        break
+            x1 = F.max_pool2d(org, (8, 8))
+            x1 = self.resnet50.conv1(x1)
+            x1 = self.resnet50.bn1(x1)
+            x1 = self.resnet50.relu(x1)
+            x1 = self.resnet50.maxpool(x1)
+            x1, _ = self.forward(self.resnet50.layer1[0], x1)
+            x1, _ = self.forward(self.resnet50.layer1[1], x1)
+            _, out1 = self.forward(self.resnet50.layer1[2], x1)
+            x_ = torch.cat([x_, out1], dim=1)
+
+            x2 = F.max_pool2d(org, (4, 4))
+            x2 = self.resnet50.conv1(x2)
+            x2 = self.resnet50.bn1(x2)
+            x2 = self.resnet50.relu(x2)
+            x2 = self.resnet50.maxpool(x2)
+            x2, _ = self.forward(self.resnet50.layer1[0], x2)
+            x2, _ = self.forward(self.resnet50.layer1[1], x2)
+            x2, _ = self.forward(self.resnet50.layer1[2], x2)
+            x2, _ = self.forward(self.resnet50.layer2[0], x2)
+            x2, _ = self.forward(self.resnet50.layer2[1], x2)
+            x2, _ = self.forward(self.resnet50.layer2[2], x2)
+            _, out2 = self.forward(self.resnet50.layer2[3], x2)
+            x_ = torch.cat([x_, out2], dim=1)
+
+            x3 = F.max_pool2d(org, (2, 2))
+            x3 = self.resnet50.conv1(x3)
+            x3 = self.resnet50.bn1(x3)
+            x3 = self.resnet50.relu(x3)
+            x3 = self.resnet50.maxpool(x3)
+            x3, _ = self.forward(self.resnet50.layer1[0], x3)
+            x3, _ = self.forward(self.resnet50.layer1[1], x3)
+            x3, _ = self.forward(self.resnet50.layer1[2], x3)
+            x3, _ = self.forward(self.resnet50.layer2[0], x3)
+            x3, _ = self.forward(self.resnet50.layer2[1], x3)
+            x3, _ = self.forward(self.resnet50.layer2[2], x3)
+            x3, _ = self.forward(self.resnet50.layer2[3], x3)
+            x3, _ = self.forward(self.resnet50.layer3[0], x3)
+            x3, _ = self.forward(self.resnet50.layer3[1], x3)
+            x3, _ = self.forward(self.resnet50.layer3[2], x3)
+            x3, _ = self.forward(self.resnet50.layer3[3], x3)
+            x3, _ = self.forward(self.resnet50.layer3[4], x3)
+            _, out3 = self.forward(self.resnet50.layer3[5], x3)
+            x_ = torch.cat([x_, out3], dim=1)
+
+            x4 = F.max_pool2d(org, (1, 1))
+            x4 = self.resnet50.conv1(x4)
+            x4 = self.resnet50.bn1(x4)
+            x4 = self.resnet50.relu(x4)
+            x4 = self.resnet50.maxpool(x4)
+            x4, _ = self.forward(self.resnet50.layer1[0], x4)
+            x4, _ = self.forward(self.resnet50.layer1[1], x4)
+            x4, _ = self.forward(self.resnet50.layer1[2], x4)
+            x4, _ = self.forward(self.resnet50.layer2[0], x4)
+            x4, _ = self.forward(self.resnet50.layer2[1], x4)
+            x4, _ = self.forward(self.resnet50.layer2[2], x4)
+            x4, _ = self.forward(self.resnet50.layer2[3], x4)
+            x4, _ = self.forward(self.resnet50.layer3[0], x4)
+            x4, _ = self.forward(self.resnet50.layer3[1], x4)
+            x4, _ = self.forward(self.resnet50.layer3[2], x4)
+            x4, _ = self.forward(self.resnet50.layer3[3], x4)
+            x4, _ = self.forward(self.resnet50.layer3[4], x4)
+            x4, _ = self.forward(self.resnet50.layer3[5], x4)
+            x4, _ = self.forward(self.resnet50.layer4[0], x4)
+            x4, _ = self.forward(self.resnet50.layer4[1], x4)
+            _, out4 = self.forward(self.resnet50.layer4[2], x4)
+            x_ = torch.cat([x_, out4], dim=1)
 
         if self.cutoff_edge_width > 0:
             x_ = x_[
@@ -165,3 +203,25 @@ class ResNet50ScaledFeatures(object):
             x_.std(dim=(2, 3), keepdim=True)
 
         return x_
+
+    def forward(self, f, x):
+        identity = x
+
+        out1 = f.conv1(x)
+        out2 = f.bn1(out1)
+        out3 = f.relu(out2)
+
+        out4 = f.conv2(out3)
+        out5 = f.bn2(out4)
+        out6 = f.relu(out5)
+
+        out7 = f.conv3(out6)
+        out8 = f.bn3(out7)
+
+        if f.downsample is not None:
+            identity = f.downsample(x)
+
+        out9 = out8 + identity
+        out10 = f.relu(out9)
+
+        return out10, out4
