@@ -125,7 +125,7 @@ class ResNet50ScaledFeatures(object):
     def __call__(self, org):
         x_ = torch.tensor([])
         with torch.no_grad():
-            x1 = F.max_pool2d(org, (8, 8))
+            x1 = F.max_pool2d(org, (4, 4))
             x1 = self.resnet50.conv1(x1)
             x1 = self.resnet50.bn1(x1)
             x1 = self.resnet50.relu(x1)
@@ -134,8 +134,10 @@ class ResNet50ScaledFeatures(object):
             x1, _ = self.forward(self.resnet50.layer1[1], x1)
             _, out1 = self.forward(self.resnet50.layer1[2], x1)
             x_ = torch.cat([x_, out1], dim=1)
+            print(out1.shape)
+            del(x1)
 
-            x2 = F.max_pool2d(org, (4, 4))
+            x2 = F.max_pool2d(org, (2, 2))
             x2 = self.resnet50.conv1(x2)
             x2 = self.resnet50.bn1(x2)
             x2 = self.resnet50.relu(x2)
@@ -148,8 +150,9 @@ class ResNet50ScaledFeatures(object):
             x2, _ = self.forward(self.resnet50.layer2[2], x2)
             _, out2 = self.forward(self.resnet50.layer2[3], x2)
             x_ = torch.cat([x_, out2], dim=1)
+            del(x2)
 
-            x3 = F.max_pool2d(org, (2, 2))
+            x3 = F.max_pool2d(org, (1, 1))
             x3 = self.resnet50.conv1(x3)
             x3 = self.resnet50.bn1(x3)
             x3 = self.resnet50.relu(x3)
@@ -168,6 +171,7 @@ class ResNet50ScaledFeatures(object):
             x3, _ = self.forward(self.resnet50.layer3[4], x3)
             _, out3 = self.forward(self.resnet50.layer3[5], x3)
             x_ = torch.cat([x_, out3], dim=1)
+            del(x3)
 
             x4 = F.max_pool2d(org, (1, 1))
             x4 = self.resnet50.conv1(x4)
@@ -190,7 +194,10 @@ class ResNet50ScaledFeatures(object):
             x4, _ = self.forward(self.resnet50.layer4[0], x4)
             x4, _ = self.forward(self.resnet50.layer4[1], x4)
             _, out4 = self.forward(self.resnet50.layer4[2], x4)
+            out4 = F.interpolate(out4, (32, 32), mode='nearest')
             x_ = torch.cat([x_, out4], dim=1)
+            del(x4)
+            print('done')
 
         if self.cutoff_edge_width > 0:
             x_ = x_[

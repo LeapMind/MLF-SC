@@ -35,7 +35,7 @@ class SparseCodingWithMultiDict(object):
         self.patch_size = model_env["patch_size"]
         self.stride = model_env["stride"]
         self.num_of_ch = model_env["num_of_ch"]
-        self.output_npy = model_env["output_npy"]
+        self.output_npy = False
 
         self.org_l = int(256 / 8.0) - self.cutoff_edge_width * 2
 
@@ -47,7 +47,10 @@ class SparseCodingWithMultiDict(object):
 
     def train(self):
         arrs = []
+        cnt = 0
         for batch_data in self.train_loader:
+            print(cnt)
+            cnt += 1
             batch_img = batch_data[2]
             for p in self.preprocesses:
                 batch_img = p(batch_img)
@@ -107,7 +110,7 @@ class SparseCodingWithMultiDict(object):
         top_5 = numpy.zeros(len(self.dictionaries))
 
         random.seed(0)
-        dict_order = list(range(896))
+        dict_order = list(range(960))
         random.shuffle(dict_order)
 
         for batch_data in tqdm(loader, desc="testing"):
