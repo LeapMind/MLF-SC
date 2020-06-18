@@ -2,7 +2,6 @@
 
 [![Actions Status](https://github.com/LeapMind/MLF-SC/workflows/MLF-SC/badge.svg)](https://github.com/LeapMind/MLF-SC/actions)
 [![Maintainability](https://api.codeclimate.com/v1/badges/88983fffd83c373f5808/maintainability)](https://codeclimate.com/github/LeapMind/MLF-SC/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/88983fffd83c373f5808/test_coverage)](https://codeclimate.com/github/LeapMind/MLF-SC/test_coverage)
 
 MLF-SC (Multi-Layer Feature Sparse Coding) is an anomaly detection method that incorporates multi-scale features to sparse coding.
 This is a PyTorch implementation for [MVTec](https://www.mvtec.com/company/research/datasets/mvtec-ad/) datasets (Carpet, Grid, Leather, Tile, Wood, ...).
